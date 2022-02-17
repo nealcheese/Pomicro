@@ -1,0 +1,7 @@
+Code for timer sorted
+Add functionality for switching between work states
+	1. Add start time for each work state into an array or call start time for the current work state
+	2. Add start/stop and skip buttons - skip button moves to next work state
+	3. At end of work state automatically move to next work state
+	
+Change timer to scheduled executor service - seems to be much better
