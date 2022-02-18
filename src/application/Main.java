@@ -24,8 +24,8 @@ import javafx.scene.text.Text;
 public class Main extends Application {
 	
 	//Set duration for work states, will add an input field in a dialog box for these
-	static int work_minutes = 25;
-	static int break_minutes = 5;
+	static int work_minutes = 1;
+	static int break_minutes = 1;
 	
 	//Declare variable used to store the current time left, define the starting values on startup	
 	static int minutes_remaining = work_minutes;
@@ -44,6 +44,8 @@ public class Main extends Application {
 	static TimerTask timerStarts;
 	static Timer timer;
 	
+	static Button start_button; 
+	
 	//TBH I don't understand why this syntax is required for JavaFX, is an error catch required? Look into this further
 	@Override
 	public void start(Stage primaryStage) {
@@ -56,13 +58,16 @@ public class Main extends Application {
 			timer_display.setWrappingWidth(40);
 			
 			//On start, create the start button that says go
-			Button start_button = new Button();
+			start_button = new Button();
 		    ImageView goImage = new ImageView(new Image("C:/Users/neala/eclipse-workspace/Pomicro/src/application/Play Green Triangle.png", 10, 10, false, false));
+		    ImageView stopImage = new ImageView(new Image("C:/Users/neala/eclipse-workspace/Pomicro/src/application/Stop Red Circle.png", 10, 10, false, false));
+		    ImageView skipImage = new ImageView(new Image("C:/Users/neala/eclipse-workspace/Pomicro/src/application/Skip Yellow Triangle.png", 10, 10, false, false));
 		    start_button.setGraphic(goImage);
-			start_button.setMinWidth(40);
+			start_button.setMinWidth(20);
 			start_button.setMaxHeight(20);
-			Button skip_button = new Button("Skip");
-			skip_button.setMinWidth(40);
+			Button skip_button = new Button();
+			skip_button.setGraphic(skipImage);
+			skip_button.setMinWidth(20);
 			skip_button.setMaxHeight(20);
 			
 			//On start, create a text node that displays the work state (working, break etc.)
@@ -83,14 +88,14 @@ public class Main extends Application {
 	            		timer.cancel();
 	            		timer_is_on = false;
 	            		System.out.println(timer_is_on);
-	            		start_button.setText("Go");
+	            		start_button.setGraphic(goImage);
 	            	}
 	            	
 	            	else {
-	            		createTT(timer_display);
+	            		createTT(timer_display, start_button, work_state_display, goImage);
 	            	timer_is_on = true;
 	            	System.out.println(timer_is_on);
-	            	start_button.setText("Stop");
+	            	start_button.setGraphic(stopImage);
 	            	if(work_state_display.getText() == "Start Work") {
 	            		work_state_display.setText("Work");
 	            	}
@@ -108,14 +113,14 @@ public class Main extends Application {
 	        {
 	            public void handle(ActionEvent e)
 	            {	
-	            	nextWorkState(work_state_display, timer_display);
+	            	nextWorkState(work_state_display, timer_display, start_button, goImage);
 	            	
             	}
 	        });
 			
 			
 			HBox hBox = new HBox(timer_display, work_state_display, start_button, skip_button);
-			Scene scene = new Scene(hBox,200,20);
+			Scene scene = new Scene(hBox,170,20);
 			hBox.getStyleClass().add("hbox");
 			//hBox.setAlignment(Pos.CENTER);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -134,7 +139,7 @@ public class Main extends Application {
 		}
 	}
 	
-	public void createTT(Text timer_display) {
+	public void createTT(Text timer_display, Button start_button, Text work_state_display, ImageView goImage) {
 		timer = new Timer();
 		timerStarts = new TimerTask() {
             @Override
@@ -164,7 +169,9 @@ public class Main extends Application {
               	//when timer reaches 0, updates timer display and end the timertask
             	if(seconds_remaining == 0 && minutes_remaining == 0) {
             		current_time = Integer.toString(minutes_remaining) + ":0" + Integer.toString(seconds_remaining);
-            		timer.cancel();
+            		nextWorkState(work_state_display, timer_display, start_button, goImage);
+            		
+
             	}
             	//time remaining is stored as a string with the required format in each if statement, set timer display to string
             	timer_display.setText(current_time);
@@ -173,8 +180,12 @@ public class Main extends Application {
 		timer.scheduleAtFixedRate(timerStarts, 1000, 1000);
 	};
 	
-	public void nextWorkState(Text work_state_display, Text timer_display) { 
-    	if(work_state_display.getText() == "Start Work" || work_state_display.getText() == "Work") {
+	public void nextWorkState(Text work_state_display, Text timer_display,  Button start_button, ImageView goImage) { 
+//		goImage = new ImageView(new Image("C:/Users/neala/eclipse-workspace/Pomicro/src/application/Play Green Triangle.png", 10, 10, false, false));
+		start_button.setText("OK");
+		System.out.println("Timer Finished");
+		
+		if(work_state_display.getText() == "Start Work" || work_state_display.getText() == "Work") {
     		work_state_display.setText("Start Break");
     		minutes_remaining = break_minutes;
     		seconds_remaining = 0;
